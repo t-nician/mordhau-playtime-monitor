@@ -1,0 +1,38 @@
+{ // Copy example.config.jsonc -> config.jsonc and edit there!
+    "rcon": {
+        "host": "127.0.0.1",
+        "port": 5000,
+        "password": "password"
+    },
+
+    "databases": {
+        "selected": "Local Storage",
+        "options": [
+            {
+                "url": "./database.sqlite",
+                
+                "name": "Local Storage",
+                "type": "sqlite"
+            },
+
+            {
+                "url": ":memory:",
+
+                "name": "Temp Storage",
+                "type": "sqlite"
+            },
+
+            {
+                "url": "... MongoDB",
+
+                "name": "mongodb",
+                "type": "mongodb",
+
+                "credentials": {
+                    "username": "",
+                    "password": ""
+                }
+            }
+        ]
+    }
+}
