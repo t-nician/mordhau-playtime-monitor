@@ -23,6 +23,22 @@
             },
 
             {
+                "url": "",
+
+                "name": "Postgres Database",
+                "type": "postgres",
+
+                "host": "",
+                "port": -1,
+
+                "credentials": {
+                    "username": "",
+                    "password": "",
+                    "database": ""
+                }
+            },
+
+            {
                 "url": "... MongoDB",
 
                 "name": "mongodb",
@@ -30,7 +46,8 @@
 
                 "credentials": {
                     "username": "",
-                    "password": ""
+                    "password": "",
+                    "database": ""
                 }
             }
         ]
