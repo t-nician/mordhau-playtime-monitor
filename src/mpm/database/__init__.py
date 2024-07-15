@@ -22,6 +22,5 @@ class DatabaseInterface:
                 case DatabaseType.MONGODB:
                     pass
             
-            print("establish")
             self.database.establish()
                 
