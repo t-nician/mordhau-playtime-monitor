@@ -10,25 +10,25 @@ class DatabaseType(Enum):
     MONGODB = "mongodb"
 
 
-__DB_TYPE_TO_STR = lambda type: ( 
-    "  " * 5 + "DatabaseType." + type.name + f"(\"{type.value}\")\n"
+__DB_TYPE_TO_STR = lambda type: (
+    "   " * 5 + "DatabaseType.{0} (\"{1}\")\n".format(
+        str(type.name), str(type.value)
+    )
 )
 
-DB_CONF_INVALID_TYPE = "Invalid DatabaseType!\n\n"
-DB_CONF_INVALID_TYPE = DB_CONF_INVALID_TYPE + "databases.{0}.{1} = '{2}' {3}"
-DB_CONF_INVALID_TYPE = DB_CONF_INVALID_TYPE + "\n"
-DB_CONF_INVALID_TYPE = DB_CONF_INVALID_TYPE + "\nAvailable DatabaseTypes:\n"
+__COMPILED_DATABASE_TYPES = "".join([
+    __DB_TYPE_TO_STR(type) for type in DatabaseType
+]).removesuffix("\n")
 
-__COMPILED_DATABASE_TYPES = [__DB_TYPE_TO_STR(type) for type in DatabaseType]
+CONF_INVALID_DB_TYPE = "Invalid DatabaseType!\n\n"
+CONF_INVALID_DB_TYPE = CONF_INVALID_DB_TYPE + "databases.{0}.{1} = '{2}' {3}"
+CONF_INVALID_DB_TYPE = CONF_INVALID_DB_TYPE + "\n\n"
+CONF_INVALID_DB_TYPE = CONF_INVALID_DB_TYPE + "Available DatabaseTypes:\n"
+CONF_INVALID_DB_TYPE = CONF_INVALID_DB_TYPE + __COMPILED_DATABASE_TYPES
 
-DB_CONF_INVALID_TYPE = DB_CONF_INVALID_TYPE + "".join(
-    __COMPILED_DATABASE_TYPES
-)
+CONF_DUPLICATE_DB_NAME = ""
 
-DB_CONF_INVALID_TYPE = DB_CONF_INVALID_TYPE.removesuffix("\n")
-
-MAIN_CONF_INVALID_PATH = "Cannot load config from path: '{0}'"
-MAIN_CONF_DUPE_NAME = ""
+CONF_INVALID_FILE_PATH = "Cannot load config from path: '{0}'"
 
 
 @dataclass
@@ -48,7 +48,7 @@ class DatabaseConfig:
     
     def __conf_invalid_database_type(self):
         raise Exception(
-            DB_CONF_INVALID_TYPE.format(
+            CONF_INVALID_DB_TYPE.format(
                 str(self.name), "type", str(self.type), str(type(self.type))
             )
         )
@@ -96,7 +96,7 @@ class MainConfig:
                 return database
     
     def __post_init__(self):
-        assert os.path.exists(self.path), MAIN_CONF_INVALID_PATH.format(
+        assert os.path.exists(self.path), CONF_INVALID_FILE_PATH.format(
             self.path
         )
         
@@ -114,7 +114,9 @@ class MainConfig:
                 database_dict.get("name")
             )
             
-            assert existing_database is None, 
+            assert existing_database is None, CONF_DUPLICATE_DB_NAME.format(
+                str(database_dict.get("name"))
+            )
             
             if creds:
                 del database_dict["credentials"]
