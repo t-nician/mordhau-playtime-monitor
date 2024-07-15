@@ -15,6 +15,9 @@ class MordhauMonitor:
 
     database: DatabaseInterface | None = field(default=None)
     playerlist: list[MordhauPlayer] = field(default_factory=list)
+    
+    __on_join_listeners: list[(MordhauPlayer)] = field(default_factory=list)
+    __on_leave_listeners: list[(MordhauPlayer)] = field(default_factory=list)
         
     def __post_init__(self):
         self.database = DatabaseInterface(
@@ -29,9 +32,26 @@ class MordhauMonitor:
         for c_player in self.playerlist:
             if c_player.playfab == playfab:
                 player = c_player
+                break
         
         if player is not None:
             self.playerlist.remove(player)
+    
+    def __emit(self, func_list: list[(any)], *args):
+        for func in func_list:
+            func(*args)
+    
+    def on_join(self, func):
+        self.__on_join_listeners.append(func)
+        def wrapper(*arg, **kwargs):
+            return func(*arg, **kwargs)
+        return wrapper
+    
+    def on_leave(self, func):
+        self.__on_leave_listeners.append(func)
+        def wrapper(*arg, **kwargs):
+            return func(*arg, **kwargs)
+        return wrapper
     
     def get_player_by_playfab(self, playfab: str) -> MordhauPlayer | None:
         for player in self.playerlist:
@@ -65,7 +85,8 @@ class MordhauMonitor:
                     if not player:
                         player = MordhauPlayer(playfab, name)
                         self.playerlist.append(player)
-                        print(playfab, name, "joined!")
+                        self.__emit(self.__on_join_listeners, player)
+                        #print(playfab, name, "joined!")
                         # TODO emit that a player has joined!
                     
                     dict_playerlist[playfab] = player
@@ -73,6 +94,8 @@ class MordhauMonitor:
                 for player in self.playerlist:
                     if not dict_playerlist.get(player.playfab):
                         self.__remove_player_from_playerlist(player.playfab)
-                        print(player.playfab, player.name, "left!")
+                        self.__emit(self.__on_leave_listeners, player)
+                        #print(player.playfab, player.name, "left!")
+                        
                         # TODO emit player left!
                     #playerlist[index] = self.get_player_by_playfab(playfab) or MordhauPlayer(playfab, name)
