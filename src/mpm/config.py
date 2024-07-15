@@ -6,7 +6,10 @@ from dataclasses import dataclass, field
 
 
 class DatabaseType(Enum):
+    MYSQL = "mysql"
     SQLITE = "sqlite"
+    POSTGRES = "postgres"
+    
     MONGODB = "mongodb"
 
 
@@ -35,6 +38,7 @@ CONF_INVALID_FILE_PATH = "Cannot load config from path: '{0}'"
 class Credentials:
     username: str = field(default="")
     password: str = field(default="")
+    database: str = field(default="")
     
 
 @dataclass
@@ -45,6 +49,9 @@ class DatabaseConfig:
     type: DatabaseType = field(default="")
     
     credentials: Credentials | None = field(default=None)
+    
+    host: str = field(default="")
+    port: int = field(default=-1)
     
     def __conf_invalid_database_type(self):
         raise Exception(
