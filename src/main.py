@@ -1,5 +1,2 @@
-import mpm
+from mpm import config, object, monitor, database
 
-test = mpm.config.MainConfig()
-
-print(test)

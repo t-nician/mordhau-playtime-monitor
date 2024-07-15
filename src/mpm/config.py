@@ -81,6 +81,11 @@ class Databases:
     selected: str = field(default="")
     
     options: list[DatabaseConfig] = field(default_factory=list)
+    
+    def get_database_by_name(self, name: str) -> DatabaseConfig | None:
+        for database in self.options:
+            if database.name == name:
+                return database
 
 
 @dataclass
@@ -89,11 +94,6 @@ class MainConfig:
     
     rcon: Rcon | None = field(default=None)
     databases: Databases | None = field(default=None)
-    
-    def get_database_by_name(self, name: str) -> DatabaseConfig | None:
-        for database in self.databases.options:
-            if database.name == name:
-                return database
     
     def __post_init__(self):
         assert os.path.exists(self.path), CONF_INVALID_FILE_PATH.format(
@@ -110,7 +110,7 @@ class MainConfig:
         
         for database_dict in config.get("databases").get("options"):
             creds = database_dict.get("credentials")
-            existing_database = self.get_database_by_name(
+            existing_database = self.databases.get_database_by_name(
                 database_dict.get("name")
             )
             
