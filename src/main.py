@@ -17,6 +17,7 @@ def on_leave(player: monitor.MordhauPlayer):
             player.get_session_time()
         )
     )
-
+    
+    mordhau_monitor.save_player_playtime(player)
 
 mordhau_monitor.start_playtime_monitor()

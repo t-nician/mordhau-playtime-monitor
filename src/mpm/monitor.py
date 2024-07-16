@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from rcon.source import Client
 
 from mpm.config import MainConfig
+
 from mpm.object import MordhauPlayer
 from mpm.database import DatabaseInterface
 
@@ -53,6 +54,9 @@ class MordhauMonitor:
             return func(*arg, **kwargs)
         return wrapper
     
+    def save_player_playtime(self, player: MordhauPlayer):
+        self.database.save_playtime_data(player)
+    
     def get_player_by_playfab(self, playfab: str) -> MordhauPlayer | None:
         for player in self.playerlist:
             if player.playfab == playfab:
@@ -72,6 +76,9 @@ class MordhauMonitor:
                 
                 dict_playerlist: dict[str, MordhauPlayer] = {}
                 
+                if len(str_playerlist) == 0:
+                    pass
+                    
                 for player_str in str_playerlist:
                     playfab, *remaining = player_str.split(", ")
                     
@@ -86,8 +93,6 @@ class MordhauMonitor:
                         player = MordhauPlayer(playfab, name)
                         self.playerlist.append(player)
                         self.__emit(self.__on_join_listeners, player)
-                        #print(playfab, name, "joined!")
-                        # TODO emit that a player has joined!
                     
                     dict_playerlist[playfab] = player
                 
@@ -95,7 +100,3 @@ class MordhauMonitor:
                     if not dict_playerlist.get(player.playfab):
                         self.__remove_player_from_playerlist(player.playfab)
                         self.__emit(self.__on_leave_listeners, player)
-                        #print(player.playfab, player.name, "left!")
-                        
-                        # TODO emit player left!
-                    #playerlist[index] = self.get_player_by_playfab(playfab) or MordhauPlayer(playfab, name)

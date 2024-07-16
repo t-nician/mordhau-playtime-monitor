@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 
+from mpm.object import MordhauPlayer
 from mpm.config import DatabaseType, DatabaseConfig
+
 from mpm.database import mongodb, peewee, base
 
 
@@ -9,6 +11,9 @@ class DatabaseInterface:
     config: DatabaseConfig | None = field(default=None)
     
     database: base.BaseDatabase | None = field(default=None)
+    
+    def save_playtime_data(self, player: MordhauPlayer):
+        self.database.save_playtime_player(player)
     
     def __post_init__(self):
         if self.config is not None:
@@ -20,7 +25,7 @@ class DatabaseInterface:
                 case DatabaseType.MYSQL:
                     self.database = peewee.PeeweeDatabase(self.config)
                 case DatabaseType.MONGODB:
-                    pass
+                    self.database = mongodb.MongoDatabase(self.config)
             
             self.database.establish()
                 

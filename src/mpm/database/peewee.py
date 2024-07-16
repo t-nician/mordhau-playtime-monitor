@@ -2,8 +2,9 @@ import peewee
 
 from dataclasses import dataclass, field
 
-
 from mpm.config import DatabaseType
+from mpm.object import MordhauPlayer
+
 from mpm.database.base import BaseDatabase
 
 
@@ -28,6 +29,43 @@ class PeeweeDatabase(BaseDatabase):
         default=None
     )
     
+    def __get_playtime_model(self, playfab: str) -> Playtime:
+        try:
+            return Playtime.get(
+                Playtime.playfab==playfab
+            )
+        except peewee.DoesNotExist: 
+            return Playtime.create(
+                playfab=playfab,
+                one_week=0,
+                two_weeks=0,
+                one_month=0,
+                total_playtime=0
+            )
+    
+    def get_playtime_data(self, player: str | MordhauPlayer) -> dict:
+        playfab = type(player) is MordhauPlayer and player.playfab or player
+        result = self.__get_playtime_model(playfab)
+        
+        return {
+            "playfab": playfab,
+            "one_week": result.one_week,
+            "two_weeks": result.two_weeks,
+            "one_month": result.one_month,
+            "total_playtime": result.total_playtime
+        }
+        
+    def save_playtime_player(self, player: MordhauPlayer) -> dict:
+        session = player.get_session_time()
+        playtime_model = self.__get_playtime_model(player.playfab)
+        
+        playtime_model.total_playtime += session
+        playtime_model.one_week += session
+        playtime_model.two_weeks += session
+        playtime_model.one_month += session
+        
+        playtime_model.save()
+        
     def establish(self):
         match self.config.type:
             case DatabaseType.SQLITE:
