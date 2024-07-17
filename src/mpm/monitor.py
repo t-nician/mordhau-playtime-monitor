@@ -69,9 +69,18 @@ class MordhauMonitor:
             passwd=self.config.rcon.password
         ) as client:
             while time.sleep(1) or True:
-                str_playerlist = client.run("playerlist")
+                str_playerlist = ""
+                
+                try:
+                    str_playerlist = client.run("playerlist")
+                except:
+                    pass
                 
                 str_playerlist = str_playerlist.split("\n")
+                
+                if len(str_playerlist) == 0:
+                    continue
+                
                 str_playerlist.pop()
                 
                 dict_playerlist: dict[str, MordhauPlayer] = {}
