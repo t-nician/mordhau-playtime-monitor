@@ -22,46 +22,44 @@ class MongoDatabase(BaseDatabase):
     def get_playtime_data(self, player: str | MordhauPlayer) -> dict:
         playfab = type(player) is MordhauPlayer and player.playfab or player
         
-        with timeout(5):
-            try:
-                return self.playtime_collection.find({
+        try:
+            return self.playtime_collection.find({
                     "playfab": playfab
-                })[0]
-            except Exception as _:
-                if str(_) != "no such item for Cursor instance":
-                    raise _
+            })[0]
+        except Exception as _:
+            if str(_) != "no such item for Cursor instance":
+                raise _
                 
-                return {
-                    "playfab": playfab,
-                    "one_week": 0,
-                    "two_weeks": 0,
-                    "one_month": 0,
-                    "total_playtime": 0
-                }
+            return {
+                "playfab": playfab,
+                "one_week": 0,
+                "two_weeks": 0,
+                "one_month": 0,
+                "total_playtime": 0
+            }
     
     def save_playtime_player(self, player: MordhauPlayer):
             session = player.get_session_time()
             existing_data = self.get_playtime_data(player.playfab)
             
-            with timeout(5):
-                if existing_data:
-                    self.playtime_collection.insert_one({
-                        "playfab": player.playfab,
-                        "one_week": session,
-                        "two_weeks": session,
-                        "one_month": session,
-                        "total_playtime": session
-                    })
-                else:
-                    self.playtime_collection.update_one(
-                        {"playfab": player.playfab},
-                        {"$set": {
-                            "one_week": existing_data["one_week"] + session,
-                            "two_weeks": existing_data["two_weeks"] + session,
-                            "one_month": existing_data["one_month"] + session,
-                            "total_playtime": existing_data["total_playtime"] + session
-                        }}
-                    )
+            if existing_data:
+                self.playtime_collection.insert_one({
+                    "playfab": player.playfab,
+                    "one_week": session,
+                    "two_weeks": session,
+                    "one_month": session,
+                    "total_playtime": session
+                })
+            else:
+                self.playtime_collection.update_one(
+                    {"playfab": player.playfab},
+                    {"$set": {
+                        "one_week": existing_data["one_week"] + session,
+                        "two_weeks": existing_data["two_weeks"] + session,
+                        "one_month": existing_data["one_month"] + session,
+                        "total_playtime": existing_data["total_playtime"] + session
+                    }}
+                )
     
     def establish(self):
         self.connection = MongoClient(
@@ -70,5 +68,8 @@ class MongoDatabase(BaseDatabase):
             password=self.config.credentials.password
         )
                     
-        self.mordhau_database = self.connection[self.config.credentials.database]
+        self.mordhau_database = self.connection[
+            self.config.credentials.database
+        ]
+        
         self.playtime_collection = self.mordhau_database["playtime"]
