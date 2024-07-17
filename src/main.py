@@ -15,13 +15,10 @@ def on_join(player: monitor.MordhauPlayer):
     print(
         player.playfab, 
         player.name, 
-        "has joined! Total Playtime: {0}".format(
+        "has joined! Saved Playtime: {0}".format(
             playtime_data["total_playtime"]
         )
     )
-    
-    if playtime_data["total_playtime"] == 0:
-        mordhau_monitor.save_player_playtime(player)
 
 @mordhau_monitor.on_leave
 def on_leave(player: monitor.MordhauPlayer):
