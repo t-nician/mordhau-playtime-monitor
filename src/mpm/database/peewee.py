@@ -43,6 +43,13 @@ class PeeweeDatabase(BaseDatabase):
                 total_playtime=0
             )
     
+    def get_player_rank(self, playfab):
+        sorted = Playtime.select().order_by(Playtime.total_playtime.desc())
+        
+        for rank, model in enumerate(sorted):
+            if model.playfab == playfab:
+                return rank
+            
     def get_playtime_data(self, player: str | MordhauPlayer) -> dict:
         playfab = type(player) is MordhauPlayer and player.playfab or player
         result = self.__get_playtime_model(playfab)

@@ -100,6 +100,9 @@ def chat_handler():
                     
                     
                     total_playtime = playtime_data["total_playtime"] + session_time
+                    playtime_rank = mordhau_monitor.database.database.get_player_rank(
+                        playfab
+                    )
                     
                     total_time = "%dd %dh %dm %ds" % format_time(
                         total_playtime
@@ -107,7 +110,7 @@ def chat_handler():
                     
                     client.run(
                         "say",
-                        f"[{playfab} - {name}]\nTotal: " + total_time
+                        f"[{playfab} - {name}]\nPlaytime: " + total_time + "\nRank: " + str(playtime_rank)
                     )
                 elif message.lower().startswith(".discord"):
                     client.run(
@@ -130,5 +133,6 @@ if __name__ == "__main__":
     while True:
         try:
             chat_handler()
-        except:
+        except Exception as err:
+            print("ERROR", err)
             time.sleep(5)
