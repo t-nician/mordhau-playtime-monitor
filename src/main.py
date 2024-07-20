@@ -109,6 +109,11 @@ def chat_handler():
                         "say",
                         f"[{playfab} - {name}]\nTotal: " + total_time
                     )
+                elif message.lower().startswith(".discord"):
+                    client.run(
+                        "say",
+                        f"[Discord Link]\nJoin 40's & Shorties here!\nhttps://discord.gg/v4h9VhDvNv"
+                    )
 
 
 def playtime_handler():
