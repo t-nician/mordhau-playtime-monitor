@@ -115,7 +115,7 @@ def chat_handler():
                 elif message.lower().startswith(".discord"):
                     client.run(
                         "say",
-                        f"Join the 40's & Shorties Discord!\nhttps://discord.gg/v4h9VhDvNv"
+                        f"Join the 40's & Shorties Discord!\nhttps://discord.gg/wXBUn2qSFJ"
                     )
 
 
