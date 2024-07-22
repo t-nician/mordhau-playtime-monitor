@@ -123,7 +123,8 @@ def playtime_handler():
     while True:
         try:
             mordhau_monitor.start_playtime_monitor()
-        except:
+        except Exception as err:
+            print("PLAYTIME ERR", err)
             time.sleep(5)
 
 
@@ -134,5 +135,5 @@ if __name__ == "__main__":
         try:
             chat_handler()
         except Exception as err:
-            print("ERROR", err)
+            print("CHAT ERR", err)
             time.sleep(5)
