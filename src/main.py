@@ -57,6 +57,7 @@ def chat_handler():
         while True:
             if timeouts >= 10:
                 client.run("alive")
+                timeouts = 0
                 
             chat_data = None
             
