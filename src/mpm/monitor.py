@@ -68,13 +68,18 @@ class MordhauMonitor:
             self.config.rcon.port, 
             passwd=self.config.rcon.password
         ) as client:
+            client.timeout = 5
+            
             while time.sleep(1) or True:
                 str_playerlist = ""
                 
                 try:
                     str_playerlist = client.run("playerlist")
-                except:
-                    pass
+                except Exception as exc:
+                    exc_str = str(exc)
+                    
+                    if exc_str != "timed out" and exc_str != "packet ID mismatch":
+                        raise Exception("failed to get playerlist!")
                 
                 str_playerlist = str_playerlist.split("\n")
                 
