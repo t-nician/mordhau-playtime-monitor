@@ -123,7 +123,7 @@ def chat_handler():
                             except:
                                 target_playfab_or_rank = None
                                 
-                                playtime_rank = mordhau_monitor.database.database.get_playtime_data(
+                                playtime_data = mordhau_monitor.database.database.get_playtime_data(
                                     playfab
                                 )
                                 
@@ -131,7 +131,7 @@ def chat_handler():
                                     playfab
                                 )
                     else:
-                        playtime_rank = mordhau_monitor.database.database.get_playtime_data(
+                        playtime_data = mordhau_monitor.database.database.get_playtime_data(
                             playfab
                         )
                         
