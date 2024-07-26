@@ -88,30 +88,73 @@ def chat_handler():
                 message = remaining[channel_index::]
                 
                 if message.lower().startswith(".playtime"):
+                    target_playfab_or_rank = message[len(".playtime") + 1::]
+                    
+                    if target_playfab_or_rank == "":
+                        target_playfab_or_rank = None
+                    
                     mordhau_player = mordhau_monitor.get_player_by_playfab(
                         playfab
                     )
                     
                     session_time = mordhau_player.get_session_time()
                     
-                    playtime_data = mordhau_monitor.database.database.get_playtime_data(
-                        mordhau_player
-                    )
+                    real_playfab = ""
                     
+                    playtime_data = 0
+                    playtime_rank = 0
+                    
+                    if target_playfab_or_rank:
+                        try:
+                            playtime_rank = int(target_playfab_or_rank)
+                            real_playfab, playtime_data = mordhau_monitor.database.database.get_playtime_data_by_rank(
+                                playtime_rank
+                            )
+                        except:
+                            try:
+                                real_playfab = target_playfab_or_rank
+                                playtime_data = mordhau_monitor.database.database.get_playtime_data(
+                                    target_playfab_or_rank
+                                )
+                                
+                                playtime_rank = mordhau_monitor.database.database.get_player_rank(
+                                    target_playfab_or_rank
+                                )
+                            except:
+                                target_playfab_or_rank = None
+                                
+                                playtime_rank = mordhau_monitor.database.database.get_playtime_data(
+                                    playfab
+                                )
+                                
+                                playtime_rank = mordhau_monitor.database.database.get_player_rank(
+                                    playfab
+                                )
+                    else:
+                        playtime_rank = mordhau_monitor.database.database.get_playtime_data(
+                            playfab
+                        )
+                        
+                        playtime_rank = mordhau_monitor.database.database.get_player_rank(
+                            playfab
+                        )
                     
                     total_playtime = playtime_data["total_playtime"] + session_time
-                    playtime_rank = mordhau_monitor.database.database.get_player_rank(
-                        playfab
-                    )
                     
                     total_time = "%dd %dh %dm %ds" % format_time(
                         total_playtime
                     )
                     
-                    client.run(
-                        "say",
-                        f"[{playfab} - {name}]\nPlaytime: " + total_time + "\nRank: " + str(playtime_rank)
-                    )
+                    if target_playfab_or_rank:
+                        client.run(
+                            "say",
+                            f"[{real_playfab}]\nPlaytime: " + total_time + "\nRank: " + str(playtime_rank)
+                        )
+                    else:
+                        client.run(
+                            "say",
+                            f"[{playfab} - {name}]\nPlaytime: " + total_time + "\nRank: " + str(playtime_rank)
+                        )
                 elif message.lower().startswith(".discord"):
                     client.run(
                         "say",

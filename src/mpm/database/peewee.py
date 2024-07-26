@@ -43,6 +43,19 @@ class PeeweeDatabase(BaseDatabase):
                 total_playtime=0
             )
     
+    def get_playtime_data_by_rank(self, target_rank: int) -> tuple[str, dict]:
+        sorted = Playtime.select().order_by(Playtime.total_playtime.desc())
+        
+        for rank, model in enumerate(sorted):
+            if rank == target_rank:
+                return model.playfab, {
+                    "playfab": model.playfab,
+                    "one_week": model.one_week,
+                    "two_weeks": model.two_weeks,
+                    "one_month": model.one_month,
+                    "total_playtime": model.total_playtime
+                }
+    
     def get_player_rank(self, playfab):
         sorted = Playtime.select().order_by(Playtime.total_playtime.desc())
         
