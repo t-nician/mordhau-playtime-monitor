@@ -69,6 +69,7 @@ class MordhauMonitor:
             passwd=self.config.rcon.password
         ) as client:
             client.timeout = 5
+            failures = 0
             
             while time.sleep(1) or True:
                 str_playerlist = ""
@@ -77,6 +78,10 @@ class MordhauMonitor:
                     str_playerlist = client.run("playerlist")
                 except Exception as exc:
                     exc_str = str(exc)
+                    failures += 1
+                    
+                    if failures >= 5:
+                        raise Exception("more than 5 failures restart time!")
                     
                     if exc_str != "timed out" and exc_str != "packet ID mismatch":
                         raise Exception("failed to get playerlist!")
