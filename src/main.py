@@ -40,7 +40,7 @@ def on_leave(player: monitor.MordhauPlayer):
 
 def format_time(seconds) -> tuple[int, int, int, int]:
     result =  (datetime(1, 1, 1) + timedelta(seconds=seconds))
-    return result.day - 1, result.hour, result.minute, result.second
+    return result.month - 1, result.day - 1, result.hour, result.minute, result.second
 
 
 def chat_handler():
@@ -141,7 +141,7 @@ def chat_handler():
                     
                     total_playtime = playtime_data["total_playtime"] + session_time
                     
-                    total_time = "%dd %dh %dm %ds" % format_time(
+                    total_time = "%dm %dd %dh %dm %ds" % format_time(
                         total_playtime
                     )
                     
